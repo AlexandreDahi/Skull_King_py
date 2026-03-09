@@ -67,7 +67,7 @@ class ConnectionManager:
                 del self.active_connections[room_uuid]
                 del self.players_info[room_uuid]
                 print(f"🗑️ Room {room_uuid} supprimée (vide)")
-
+    
     async def send_private_message(self, room_uuid: str, player_uuid: str, message: dict):
         """Envoie un message privé à un joueur spécifique"""
         if room_uuid in self.active_connections:

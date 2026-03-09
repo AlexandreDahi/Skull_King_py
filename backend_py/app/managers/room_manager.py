@@ -19,6 +19,11 @@ class RoomManager:
         self.rooms[str(new_room.uuid)] = new_room
         return new_room
     
+    def delete_room(self, room_id):
+        room = self.rooms[room_id]
+        room.destroy_game()
+        del self.rooms[room_id]
+    
     
     def get_room(self, room_uuid: str) -> Room:
         return self.rooms.get(room_uuid)
@@ -32,9 +37,6 @@ class RoomManager:
         room.add_guest(guest)
         return guest
     
-    def delete_room(self, room_uuid: str) -> None:
-        if room_uuid in self.rooms:
-            del self.rooms[room_uuid]
     
     def list_rooms(self) -> Dict[str, Room]:
         return list(self.rooms.values())
@@ -56,6 +58,9 @@ class RoomManager:
 
             game = room.game
             now = datetime.utcnow()
+
+            sleep_time = (game.next_time_stamp - now).total_seconds()
+            sleep_time = max(sleep_time, 0)
           
             if game.state == "betting":
                 
@@ -84,8 +89,22 @@ class RoomManager:
                         # inner_message = message.get("message", "")
                         await manager.broadcast_to_room(room_uuid, message)
                         print("prochain tour ou round! ")
+            
+            elif game.state == "game_end":
 
-            await asyncio.sleep(0.5)
+                if now >= game.next_time_stamp:
+                    message = {"type":"GAME_FINISHED"}
+                    await manager.broadcast_to_room(room_uuid, message)
+
+                    for player_uuid in game.players :
+                        await manager.disconnect(room_uuid, player_uuid)
+
+                    return self.delete_room(room_uuid)
+
+
+                    
+
+            await asyncio.sleep(sleep_time)
 
 
 

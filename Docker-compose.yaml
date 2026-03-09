@@ -1,0 +1,21 @@
+services :
+  bakcend:
+    build:
+      context: ./backend_py
+      dockerfile: Dockerfile.dev
+    ports:
+    - "8000:8000"
+
+    volumes: 
+    - ./backend_py/app:/app/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+    - "4200:4200"
+    - "49153:49153"
+
+    volumes: 
+    - ./frontend/src:/app/src

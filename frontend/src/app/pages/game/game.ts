@@ -5,7 +5,8 @@ import { CommonModule } from '@angular/common';
 
 import { MatIconModule } from '@angular/material/icon';
 
-import { Subscription, BehaviorSubject, Subject } from 'rxjs';
+import { Subscription, BehaviorSubject, Subject, interval } from 'rxjs';
+import { map, takeWhile, tap } from 'rxjs/operators';
 
 
 import { Hand } from '../../components/hand/hand';
@@ -58,6 +59,8 @@ export class Game implements OnInit, OnDestroy {
   totalTime: number = 45;
   timerProgress: number = 100;
   intervalId: any;
+  private timerSub?: Subscription;
+  private isRunning = false;
 
   score: number = 0;
   scorePopped: boolean = false;
@@ -141,11 +144,17 @@ export class Game implements OnInit, OnDestroy {
 
 
   startTimer() {
+    this.resetTimer(); // stop ancien
+    this.isRunning = true;
+
     const startTime = Date.now();
     const startValue = this.timer;
 
     this.ngZone.runOutsideAngular(() => {
       const tick = () => {
+
+        if (!this.isRunning) return; // 🔥 stop immédiat
+
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
         const newTimer = startValue - elapsed;
 
@@ -156,7 +165,8 @@ export class Game implements OnInit, OnDestroy {
             this.timer$.next(this.timer);
             this.timerProgress$.next(this.timerProgress);
           });
-          this.intervalId = setTimeout(tick, 1000); // 👈 replanifie seulement si actif
+
+          this.intervalId = setTimeout(tick, 1000);
         } else {
           this.ngZone.run(() => {
             this.timer = 0;
@@ -170,6 +180,7 @@ export class Game implements OnInit, OnDestroy {
   }
 
   resetTimer() {
+    this.isRunning = false;  // 🔥 IMPORTANT
     clearTimeout(this.intervalId);
     this.intervalId = null;
   }
@@ -229,6 +240,7 @@ export class Game implements OnInit, OnDestroy {
         this.totalTime = data.time
         this.timer = data.time
 
+        
         this.startTimer();
 
         // Récupérer et séparer les joueurs

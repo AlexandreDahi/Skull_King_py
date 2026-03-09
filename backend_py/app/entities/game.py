@@ -3,8 +3,11 @@ from typing import Dict, List, Optional, Tuple
 import random as rnd
 import json
 from datetime import datetime, timedelta
+import os
 
-filename = 'C:/Users/adahi/Projects/Skull_king/backend_py/index_carte.json'
+
+# chemin absolu basé sur ce script
+filename = os.path.join(os.path.dirname(__file__), "index_carte.json")
 
 
 
@@ -13,8 +16,8 @@ from app.entities.player import Player
 class Game:
     MAX_ROUND: int = 10
     TOTALE_CARDS: int = 74
-    TIME_FOR_BETTING = 300
-    TIME_TO_PLAY = 180
+    TIME_FOR_BETTING = 180
+    TIME_TO_PLAY = 60
     TIME_BETWIN_ROUND = 3
 
     def __init__(self):
@@ -46,6 +49,8 @@ class Game:
         self.time_duration_in_seconde = int
 
         self.state =""
+
+        self.butin_coople=[]
 
     
     # -------------------
@@ -132,6 +137,8 @@ class Game:
             self.current_turn = 1
             self.player_round_order()
             self.turn_cards = {}
+            self.butin_rule(self.butin_coople)
+            
             for player in self.players.values():
                 player.bet = None # Réinitialise les paris des joueurs pour la nouvelle manche
                 player.number_of_wins = 0 # Réinitialise le nombre de plis gagnés par les joueurs pour la nouvelle manche
@@ -275,9 +282,12 @@ class Game:
         turn_cards = [self.get_card_by_id(card_id) for card_id in turn_card_ids]
 
         winner_index = None
-        counter = {'pirate': 0, 'sirene': 0, 'skull_king': 0, '14_classique': 0, '14_noir': 0}  # compteur de carte spéciale : pirate, sirène, skull_king
+        counter = {'pirate': 0, 'sirene': 0, 'skull_king': 0, '14_classique': 0, '14_noir': 0,'butin': []}  # compteur de carte spéciale : pirate, sirène, skull_king
 
         for i in range(len(turn_cards)):
+
+            if turn_cards[i]['specification'] == 'butin':
+                counter['butin'].append([turn_player_uuids[i]])
 
             if turn_cards[i]['type'] == 'color':
                 if turn_cards[i]['value'] == 14:
@@ -346,10 +356,15 @@ class Game:
             self.players[self.last_turn_winner].increase_score(bonus)
             self.players[self.last_turn_winner].increase_number_of_wins()
             self.change_turn_player_order(self.last_turn_winner)
+            if counter['butin'] != []:
+                for player_b in counter['butin'] :
+                    player_b.append(turn_player_uuids[winner_index])
+                self.butin_coople.append(counter['butin'])
             return turn_player_uuids[winner_index]
         else :
             self.last_turn_winner = turn_player_uuids[0]
             self.change_turn_player_order(self.last_turn_winner)
+            self.butin_coople=[]
             return turn_player_uuids[0]
 
 
@@ -413,7 +428,7 @@ class Game:
         turn_card_ids = list(self.turn_cards.values())
         turn_player_uuids = list(self.turn_cards.keys())
         turn_cards = [self.get_card_by_id(card_id) for card_id in turn_card_ids]
-        counter = {'14_classique': 0, '14_noir': 0}
+        counter = {'14_classique': 0, '14_noir': 0,'butin':[]}
         for i in range(len(turn_cards)):
             if turn_cards[i]['type'] == 'color':
                     if turn_cards[i]['value'] == 14:
@@ -421,7 +436,13 @@ class Game:
                             counter['14_noir'] += 1
                         else:
                             counter['14_classique'] += 1
+                
+            if turn_cards[i]['specification'] == 'butin':
+                counter['butin'].append([turn_player_uuids[i]])
+
         bonus = 20*(counter.get('14_noir'))+10*(counter.get('14_classique'))
+
+        
     
         winner_index = max(
             (j for j in range(len(turn_cards)) if turn_cards[j]['type'] == 'color'),
@@ -433,11 +454,16 @@ class Game:
             self.players[self.last_turn_winner].increase_number_of_wins()
             self.players[self.last_turn_winner].increase_score(bonus)
             self.change_turn_player_order(self.last_turn_winner)
+            if counter['butin'] != []:
+                for player_b in counter['butin'] :
+                    player_b.append(turn_player_uuids[winner_index])
+                self.butin_coople.append(counter['butin'])
             
             return turn_player_uuids[winner_index]
         else:
             self.last_turn_winner = turn_player_uuids[i]
             self.change_turn_player_order(self.last_turn_winner)
+            self.butin_coople = []
             return self.last_turn_winner
     
     def end_turn_point(self,counter):
@@ -450,3 +476,11 @@ class Game:
             bonus += 40*counter.get('skull_king')
         return bonus
         
+    def butin_rule(self,butin_cooples):
+        for allies in butin_cooples :
+            if self.players[allies[0]].bet == self.players[allies[0]].number_of_wins and self.players[allies[1]].bet == self.players[allies[1]].number_of_wins :
+                self.players[allies[0]].score+=20
+                self.players[allies[1]].score+=20
+            else:
+                None
+        self.butin_coople=[]

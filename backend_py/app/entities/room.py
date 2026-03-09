@@ -68,6 +68,10 @@ class Room:
         for guest in self.guests_list:
             self.game.add_player(guest)
         self.game.start_game()
+    
+    def destroy_game(self):
+        if self.game:
+            self.game = None
         
 
 

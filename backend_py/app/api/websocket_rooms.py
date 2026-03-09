@@ -92,6 +92,9 @@ async def websocket_endpoint(
                         await manager.broadcast_to_room(room_uuid, message)
                     elif message.get("type") == "TURN_END":
                         # inner_message = message.get("message", "")
+                        # if inner_message.get("type") == "GAME_ENDED":
+
+
                         await manager.broadcast_to_room(room_uuid, message)
                         
                 if core_message.get('type') == 'ask_card':
