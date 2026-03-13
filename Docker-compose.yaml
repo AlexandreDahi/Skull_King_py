@@ -1,5 +1,5 @@
 services :
-  bakcend:
+  backend:
     build:
       context: ./backend_py
       dockerfile: Dockerfile.dev

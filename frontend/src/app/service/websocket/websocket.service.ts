@@ -33,7 +33,9 @@ export class WebSocketService {
         this.roomUuid = roomUuid
         this.playerToken = playerToken
 
-        const wsUrl = `ws://localhost:8000/ws/rooms/${roomUuid}?&player_token=${playerToken}`;
+        // const wsUrl = `ws://localhost:8000/ws/rooms/${roomUuid}?&player_token=${playerToken}`;
+        const wsUrl = `ws://15.188.11.115:8000/ws/rooms/${roomUuid}?&player_token=${playerToken}`;
+        
 
         console.log('🔌 WebSocket joinRoom:', {
             roomUuid,
