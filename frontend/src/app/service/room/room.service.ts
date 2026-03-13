@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable, tap,map } from 'rxjs';
 })
 export class RoomService {
   // private apiUrl = 'http://localhost:8000/api/rooms';
-  private apiUrl = 'http://15.237.60.236:8000/api/rooms'
+  private apiUrl = 'http://13.38.49.141:8000/api/rooms'
 
   // BehaviorSubject garde le dernier état des rooms
   private rooms = new BehaviorSubject<any[]>([]);
