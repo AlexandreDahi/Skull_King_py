@@ -5,6 +5,8 @@ services :
       dockerfile: Dockerfile.dev
     ports:
     - "8000:8000"
+    networks:
+    - skull_group
 
     volumes: 
     - ./backend_py/app:/app/app
@@ -17,5 +19,12 @@ services :
     - "4200:4200"
     - "49153:49153"
 
+    networks:
+    - skull_group
+
     volumes: 
     - ./frontend/src:/app/src
+
+networks:
+  skull-group:
+    driver: bridge
