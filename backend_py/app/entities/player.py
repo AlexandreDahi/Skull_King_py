@@ -61,9 +61,18 @@ class Player:
     def get_number_of_wins(self) -> int:
         return self.number_of_wins
     
+    ### Logique pour des bots :
 
-# alexandre = Player(name="Alexandre")
-# romain = Player(name="Romain")
-# alexandre.give_cards([1, 2, 3])
+    def estimate_hand_win_rate(self,cards):
+        win_prob=0
+        for card in cards :
+            proba = card["force"]
+            win_prob+=proba
 
-# print(f"Player 1: UUID={alexandre.uuid}, Name={alexandre.name}, Cards={alexandre.cards}; {alexandre.get_bet()}")
+        return win_prob
+    
+    def sort_hand_by_force(self):
+        self.cards.sort(key=lambda card: card["force"], reverse=True)
+        
+
+    

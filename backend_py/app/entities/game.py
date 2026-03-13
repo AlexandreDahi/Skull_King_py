@@ -11,14 +11,14 @@ filename = os.path.join(os.path.dirname(__file__), "index_carte.json")
 
 
 
-from app.entities.player import Player
+from app.entities import Player
 
 class Game:
     MAX_ROUND: int = 10
     TOTALE_CARDS: int = 74
     TIME_FOR_BETTING = 180
     TIME_TO_PLAY = 60
-    TIME_BETWIN_ROUND = 3
+    TIME_BETWIN_ROUND = 15
 
     def __init__(self):
         # Liste des joueurs
@@ -56,6 +56,8 @@ class Game:
     # -------------------
     # Gestion des joueurs
     # -------------------
+    def add_player(self,player: Player):
+        self.players[player.uuid] = player
 
     def get_current_players_order(self) -> List[str]:
         return [str(p) for p in self.current_players_order]

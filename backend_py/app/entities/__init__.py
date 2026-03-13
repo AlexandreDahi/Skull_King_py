@@ -4,5 +4,6 @@
 from .player import Player
 from .room import Room
 from .game import Game
+from .card import Card,List_Cards
 
-__all__ = ["Player", "Room", "Game"]
+__all__ = ["Player", "Room", "Game","Card","List_Cards"]
