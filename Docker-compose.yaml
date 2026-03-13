@@ -26,5 +26,5 @@ services :
     - ./frontend/src:/app/src
 
 networks:
-  skull-group:
+  skull_group:
     driver: bridge
